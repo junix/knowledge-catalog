@@ -1,0 +1,29 @@
+name: pull_multi
+description: EntryGroup with multiple entries
+setup:
+  catalog:
+    entryGroups:
+      - name: projects/t/locations/u/entryGroups/g
+    entries:
+      - name: projects/t/locations/u/entryGroups/g/entries/e0
+      - name: projects/t/locations/u/entryGroups/g/entries/e1
+      - name: projects/t/locations/u/entryGroups/g/entries/e2
+      - name: projects/t/locations/u/entryGroups/g/entries/e3
+
+  fileSystem:
+    catalog.yaml: |
+      scope: entryGroup.t.u.g
+
+actions:
+  - action: pull
+
+assert:
+  fileSystem:
+    catalog/e0.yaml:
+      contains: "name: projects/t/locations/u/entryGroups/g/entries/e0"
+    catalog/e1.yaml:
+      contains: "name: projects/t/locations/u/entryGroups/g/entries/e1"
+    catalog/e2.yaml:
+      contains: "name: projects/t/locations/u/entryGroups/g/entries/e2"
+    catalog/e3.yaml:
+      contains: "name: projects/t/locations/u/entryGroups/g/entries/e3"

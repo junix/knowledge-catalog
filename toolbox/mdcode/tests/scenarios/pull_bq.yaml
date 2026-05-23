@@ -7,7 +7,7 @@ setup:
         datasetReference:
           projectId: p
           datasetId: d
-        location: us
+        location: US
     tables:
       - id: p:d.t1
         tableReference:
@@ -34,6 +34,8 @@ actions:
 assert:
   fileSystem:
     catalog/p.d.yaml:
-      contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-dataset"
+      - contains: "name: p.d"
+      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-dataset"
     catalog/p.d/t1.yaml:
-      contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-table"
+      - contains: "name: p.d.t1"
+      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-table"

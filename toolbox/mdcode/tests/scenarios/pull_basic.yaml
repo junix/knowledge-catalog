@@ -20,4 +20,5 @@ actions:
 assert:
   fileSystem:
     catalog/e1.yaml:
-      contains: "type: projects/test/locations/global/entryTypes/et1"
+      - contains: "name: e1"
+      - contains: "type: projects/test/locations/global/entryTypes/et1"

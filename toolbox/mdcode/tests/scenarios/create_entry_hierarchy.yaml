@@ -15,7 +15,7 @@ actions:
   - action: createEntry
     name: aaa/bbb
     entry:
-      name: projects/project/locations/location/entryGroups/entryGroup/entries/aaa/bbb
+      name: aaa/bbb
       type: projects/dataplex-types/locations/global/entryTypes/generic
 
 assert:

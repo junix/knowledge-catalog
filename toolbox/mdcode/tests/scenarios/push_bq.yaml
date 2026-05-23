@@ -46,6 +46,10 @@ actions:
   - action: push
 
 assert:
+  fileSystem:
+    catalog/p.d.yaml:
+      - contains: "name: p.d"
+      - contains: "New aspect description"
   catalog:
     entries:
       - name: projects/p/locations/us/entryGroups/@bigquery/entries/bigquery.googleapis.com/projects/p/datasets/d

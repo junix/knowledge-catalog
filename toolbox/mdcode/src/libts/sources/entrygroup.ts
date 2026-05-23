@@ -2,6 +2,7 @@
 //
 
 import * as gcp from '../gcp';
+import * as dataplex from '../gcp/dataplex';
 
 
 export class EntryGroupSource {
@@ -10,11 +11,15 @@ export class EntryGroupSource {
   readonly ingestedEntries: boolean;
 
   private readonly _name: string[];
+  private readonly _entryGroup: dataplex.EntryGroup;
 
-  constructor(type: string, name: string) {
+  constructor(type: string, name: string, entryGroup: dataplex.EntryGroup) {
     this.type = type;
     this.name = name;
+
     this._name = name.split('.');
+    this._entryGroup = entryGroup;
+
     this.ingestedEntries = this._name[2].startsWith('@');
   }
 
@@ -36,5 +41,9 @@ export class EntryGroupSource {
     }
 
     return match[2];
+  }
+
+  serviceName(localName: string): string {
+    return `${gcp.catalogContainer(this._name[0], this._name[1], this._name[2])}/entries/${localName}`;
   }
 }

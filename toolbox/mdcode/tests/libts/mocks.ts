@@ -2,7 +2,7 @@ import * as gcp from '../../src/libts/gcp';
 import * as bigquery from '../../src/libts/gcp/bigquery';
 
 // Bypass actual gcloud CLI calls by using the explicit constructor
-export const TEST_API_CONTEXT = new gcp.ApiContext('test-project', 'fake-token');
+export const TEST_API_CONTEXT = new gcp.ApiContext('test-project', 'test-location', 'test-token');
 
 
 export class CatalogClientMock extends gcp.CatalogClient {

@@ -211,20 +211,21 @@ export class CatalogSnapshot {
   // Stores a Dataplex entry into the locally managed catalog snapshot. This will internally map
   // The service representation into the local metadata representation.
   // This is only meant to be used within the syncing process (as part of pull operations).
-  async _storeEntry(name: string, entry: dataplex.Entry): Promise<void> {
-    let entryPath = this._index.get(name);
+  async _storeEntry(entry: dataplex.Entry): Promise<void> {
+    const localName = this.manifest.source.localName(entry);
+    let entryPath = this._index.get(localName);
     if (!entryPath) {
-      entryPath = path.resolve(this.basePath, 'catalog', name + '.yaml');
+      entryPath = path.resolve(this.basePath, 'catalog', localName + '.yaml');
     }
 
     await fs.promises.mkdir(path.dirname(entryPath), { recursive: true });
-    await fs.promises.writeFile(entryPath, yaml.stringify(toLocalEntry(entry)));
-    this._index.set(name, entryPath);
+    await fs.promises.writeFile(entryPath, yaml.stringify(toLocalEntry(entry, localName)));
+    this._index.set(localName, entryPath);
   }
 
-  // Parses a Dataplex entry from its local metadata representation.
+  // Fetches a Dataplex entry from its local metadata representation.
   // This is only meant to be used within the syncing process (as part of push operations).
-  async _parseEntry(name: string): Promise<dataplex.Entry | undefined> {
+  async _fetchEntry(name: string): Promise<dataplex.Entry | undefined> {
     const entry = await this.lookupEntry(name);
     if (!entry) {
       throw new Error(`Entry not found: ${name}`);
@@ -235,17 +236,19 @@ export class CatalogSnapshot {
       return undefined;
     }
 
-    return fromLocalEntry(
+    const serviceName = this.manifest.source.serviceName(name);
+    return toServiceEntry(
       entry,
+      serviceName,
       this.manifest,
       this._entryTypes,
-      this._aspectTypes,
+      this._aspectTypes
     );
   }
 }
 
 // Converts a Dataplex entry into the local metadata representation.
-function toLocalEntry(entry: dataplex.Entry): md.Entry {
+function toLocalEntry(entry: dataplex.Entry, localName: string): md.Entry {
   const aspects: Record<string, md.Aspect> = {};
   if (entry.aspects) {
     for (const key in entry.aspects) {
@@ -256,7 +259,7 @@ function toLocalEntry(entry: dataplex.Entry): md.Entry {
   const entrySource = entry.entrySource ?? {};
 
   return {
-      name: entry.name,
+      name: localName,
       type: entry.entryType,
       resource: {
         name: entrySource.resource ?? undefined,
@@ -274,7 +277,8 @@ function toLocalEntry(entry: dataplex.Entry): md.Entry {
 
 
 // Converts a local metadata representation into a Dataplex Entry
-function fromLocalEntry(entry: md.Entry,
+function toServiceEntry(entry: md.Entry,
+                        serviceName: string,
                         manifest: CatalogManifest,
                         entryTypes: Map<string, dataplex.EntryType>,
                         aspectTypes: Map<string, dataplex.AspectType>): dataplex.Entry {
@@ -304,14 +308,14 @@ function fromLocalEntry(entry: md.Entry,
 
   if (manifest.source.ingestedEntries) {
     return {
-      name: entry.name,
+      name: serviceName,
       entryType: entry.type,
       aspects: aspects
     };
   }
 
   return {
-    name: entry.name,
+    name: serviceName,
     entryType: entry.type,
     parentEntry: resource.parent,
     entrySource: {

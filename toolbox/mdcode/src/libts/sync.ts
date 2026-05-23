@@ -48,8 +48,7 @@ export class CatalogSync {
           continue;
         }
 
-        const localName = this._snapshot.manifest.source.localName(res.result);
-        await this._snapshot._storeEntry(localName, res.result);
+        await this._snapshot._storeEntry(res.result);
       }
       return { success: true };
     }
@@ -63,7 +62,7 @@ export class CatalogSync {
     const entries = await this._snapshot.listEntries();
 
     for (const name of entries) {
-      const entry = await this._snapshot._parseEntry(name);
+      const entry = await this._snapshot._fetchEntry(name);
       if (!entry) {
         // If this was filtered out based on publishing config
         continue;

@@ -163,14 +163,9 @@ export class CatalogManifest {
 
   save(path: string): void {
     let scope: string | string[];
-    if (this.source.type === Sources.BIGQUERY_DATASET) {
-      const names = this.source.name.split(',');
-      if (names.length > 1) {
-        scope = names.map(n => `${Sources.BIGQUERY_DATASET}.${n}`);
-      }
-      else {
-        scope = `${this.source.type}.${this.source.name}`;
-      }
+    const names = this.source.name.split(',');
+    if (names.length > 1) {
+      scope = names.map(n => `${this.source.type}.${n}`);
     }
     else {
       scope = `${this.source.type}.${this.source.name}`;
@@ -178,13 +173,9 @@ export class CatalogManifest {
 
     const data: any = {
       scope: scope,
+      snapshot: this.snapshotConfig ?? undefined,
+      publishing: this.publishingConfig ?? undefined
     };
-    if (this.snapshotConfig) {
-      data.snapshot = this.snapshotConfig;
-    }
-    if (this.publishingConfig) {
-      data.publishing = this.publishingConfig;
-    }
     fs.writeFileSync(path, yaml.stringify(data), 'utf8');
   }
 }

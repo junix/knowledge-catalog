@@ -20,10 +20,10 @@ actions:
 assert:
   fileSystem:
     catalog/e0.yaml:
-      contains: "name: projects/t/locations/u/entryGroups/g/entries/e0"
+      contains: "name: e0"
     catalog/e1.yaml:
-      contains: "name: projects/t/locations/u/entryGroups/g/entries/e1"
+      contains: "name: e1"
     catalog/e2.yaml:
-      contains: "name: projects/t/locations/u/entryGroups/g/entries/e2"
+      contains: "name: e2"
     catalog/e3.yaml:
-      contains: "name: projects/t/locations/u/entryGroups/g/entries/e3"
+      contains: "name: e3"

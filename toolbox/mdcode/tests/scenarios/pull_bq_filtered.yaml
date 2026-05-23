@@ -45,4 +45,5 @@ assert:
   fileSystem:
     catalog/p.d.yaml: null
     catalog/p.d/t1.yaml:
-      contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-table"
+      - contains: "name: p.d/t1"
+      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-table"

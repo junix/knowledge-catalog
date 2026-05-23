@@ -32,6 +32,10 @@ actions:
   - action: push
 
 assert:
+  fileSystem:
+    catalog/custom-entry.yaml:
+      - contains: "name: custom-entry"
+      - contains: "New custom description"
   catalog:
     entries:
       - name: projects/p/locations/us/entryGroups/custom-group/entries/custom-entry

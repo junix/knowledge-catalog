@@ -3,6 +3,7 @@
 
 import * as gcp from './gcp';
 import * as bq from './gcp/bigquery';
+import * as dataplex from './gcp/dataplex';
 import { EntryGroupSource } from './sources/entrygroup';
 import { BigQueryDatasetSource } from './sources/bq-dataset';
 
@@ -14,6 +15,7 @@ export interface CatalogSource {
 
   entries(ctx: gcp.ApiContext): AsyncGenerator<gcp.Entry, void, unknown>;
   localName(entry: gcp.Entry): string;
+  serviceName(localName: string): string;
 }
 
 export enum Sources {
@@ -22,7 +24,7 @@ export enum Sources {
 }
 
 
-async function validateEntryGroup(name: string, ctx: gcp.ApiContext): Promise<void> {
+async function getEntryGroup(name: string, ctx: gcp.ApiContext): Promise<dataplex.EntryGroup> {
   const [project, location, entryGroup] = name.split('.')
   if (!project || !location || !entryGroup) {
     throw new Error('EntryGroup must be in format <projectId>.<locationId>.<entryGroupId>');
@@ -30,13 +32,16 @@ async function validateEntryGroup(name: string, ctx: gcp.ApiContext): Promise<vo
 
   const catalog = new gcp.CatalogClient(ctx);
   const res = await catalog.getEntryGroup(project, location, entryGroup);
-  if (res.status !== 200) {
+  if (!res.result) {
     throw new Error(`Failed to locate EntryGroup '${name}'.`);
   }
+
+  return res.result;
 }
 
 
-async function validateBigQueryDataset(name: string, ctx: gcp.ApiContext): Promise<void> {
+async function getBigQueryDatasets(name: string, ctx: gcp.ApiContext): Promise<Map<string, bq.Dataset>> {
+  const datasets = new Map<string, bq.Dataset>();
   const names = name.split(',');
 
   const bigQuery = new bq.BigQueryClient(ctx);
@@ -47,10 +52,14 @@ async function validateBigQueryDataset(name: string, ctx: gcp.ApiContext): Promi
     }
 
     const res = await bigQuery.getDataset(project, dataset);
-    if (res.status !== 200) {
+    if (!res.result) {
       throw new Error(`Failed to locate BigQuery dataset '${n}'.`);
     }
+
+    datasets.set(n, res.result);
   }
+
+  return datasets;
 }
 
 
@@ -58,11 +67,11 @@ export async function createSource(type: string, name: string,
                                    ctx: gcp.ApiContext): Promise<CatalogSource> {
   switch (type) {
     case Sources.ENTRYGROUP:
-      await validateEntryGroup(name, ctx);
-      return new EntryGroupSource(Sources.ENTRYGROUP, name);
+      const entryGroup = await getEntryGroup(name, ctx);
+      return new EntryGroupSource(Sources.ENTRYGROUP, name, entryGroup);
     case Sources.BIGQUERY_DATASET:
-      await validateBigQueryDataset(name, ctx);
-      return new BigQueryDatasetSource(Sources.BIGQUERY_DATASET, name);
+      const datasets = await getBigQueryDatasets(name, ctx);
+      return new BigQueryDatasetSource(Sources.BIGQUERY_DATASET, name, datasets);
     default:
       throw new Error(`Unknown source type: ${type}`);
   }

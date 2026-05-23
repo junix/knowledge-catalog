@@ -10,37 +10,25 @@ export class BigQueryDatasetSource {
   readonly name: string;
   readonly ingestedEntries = true;
 
-  private readonly _datasets: string[][];
+  private readonly _datasets: Map<string, bq.Dataset>;
 
-  constructor(type: string, name: string) {
+  constructor(type: string, name: string, datasets: Map<string, bq.Dataset>) {
     this.type = type;
     this.name = name;
-    
-    const names = name.split(',');
-    this._datasets = names.map(n => {
-      const parts = n.split('.');
-      if (parts.length !== 2) {
-        throw new Error(`BigQuery dataset must be in format <projectId>.<datasetId>: ${n}`);
-      }
-      return parts;
-    });
+
+    this._datasets = datasets;
   }
 
   async *entries(ctx: gcp.ApiContext): AsyncGenerator<gcp.Entry, void, unknown> {
     const bigQuery = new bq.BigQueryClient(ctx);
     const catalog = new gcp.CatalogClient(ctx);
 
-    for (const datasetParts of this._datasets) {
-      const [project, dataset] = datasetParts;
-
-      // Find the location of the dataset, as this is required to construct the catalog entry name.
-      const dsResource = await bigQuery.getDataset(project, dataset);
-      if (!dsResource.result) {
-        throw new Error(`Failed to get location for dataset ${project}.${dataset}`);
-      }
+    for (const [datasetName, dsResource] of this._datasets.entries()) {
+      const project = dsResource.datasetReference.projectId;
+      const dataset = dsResource.datasetReference.datasetId;
 
       // Fetch the dataset entry
-      const location = dsResource.result.location.toLowerCase();
+      const location = dsResource.location.toLowerCase();
       const dsEntryId = `bigquery.googleapis.com/projects/${project}/datasets/${dataset}`
       const dsEntryName = `${gcp.catalogContainer(project, location, '@bigquery')}/entries/${dsEntryId}`
       const dsEntryResult = await catalog.lookupEntry(project, location, dsEntryName);
@@ -88,5 +76,27 @@ export class BigQueryDatasetSource {
     }
 
     throw new Error(`Invalid BigQuery entry: ${entry.name}`);
+  }
+
+  serviceName(localName: string): string {
+    const nameParts = localName.split('/');
+    const dsResource = this._datasets.get(nameParts[0]);
+    if (!dsResource) {
+      throw new Error(`Failed to find dataset for ${nameParts[0]}`);
+    }
+
+    const project = dsResource.datasetReference.projectId;
+    const location = dsResource.location.toLowerCase();
+    const dataset = dsResource.datasetReference.datasetId;
+
+    const entryGroup = `${gcp.catalogContainer(project, location, '@bigquery')}`;
+    const entryName = `${entryGroup}/entries/bigquery.googleapis.com/projects/${project}/datasets/${dataset}`;
+    if (nameParts.length == 1) {
+      return entryName;
+    }
+
+    const collection = nameParts.length == 2 ? 'tables' : nameParts[1];
+    const resource = nameParts.length == 2 ? nameParts[1] : nameParts[2];
+    return `${entryName}/${collection}/${resource}`;
   }
 }

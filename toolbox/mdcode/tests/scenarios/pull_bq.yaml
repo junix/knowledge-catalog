@@ -35,7 +35,7 @@ assert:
   fileSystem:
     catalog/p.d.yaml:
       - contains: "name: p.d"
-      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-dataset"
+      - contains: "type: dataplex-types.global.bigquery-dataset"
     catalog/p.d/t1.yaml:
       - contains: "name: p.d.t1"
-      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-table"
+      - contains: "type: dataplex-types.global.bigquery-table"

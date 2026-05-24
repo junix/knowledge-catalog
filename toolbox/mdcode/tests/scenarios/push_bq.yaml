@@ -37,6 +37,7 @@ actions:
   - action: updateEntry
     entry:
       name: p.d
+      type: dataplex-types.global.bigquery-dataset
       aspects:
         dataplex-types.global.overview:
           content: New aspect description

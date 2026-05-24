@@ -174,6 +174,7 @@ export class CatalogSnapshot {
   }
 
   // Build the map of types supported within the locally managed catalog snapshot
+  // Types are stored using two keys: the resource name and the 3-part type name.
   private async _buildTypes(manifest: CatalogManifest, ctx: gcp.ApiContext): Promise<void> {
     const catalog = new dataplex.CatalogClient(ctx);
 
@@ -185,6 +186,7 @@ export class CatalogSnapshot {
       }
 
       this._entryTypes.set(res.result.name, res.result);
+      this._entryTypes.set(entryType, res.result);
 
       for (const requiredAspect of res.result.requiredAspects ?? []) {
         if (!this._aspectTypes.has(requiredAspect.type)) {
@@ -194,17 +196,23 @@ export class CatalogSnapshot {
             throw new Error(`Unable to load type information for aspect type ${requiredAspect.type}`);
           }
           this._aspectTypes.set(res.result.name, res.result);
+          this._aspectTypes.set(`${parts[0]}.${parts[3]}.${parts[5]}`, res.result);
         }
       }
     }
 
     for (const aspectType of manifest.snapshotConfig?.aspects || []) {
+      if (this._aspectTypes.has(aspectType)) {
+        continue;
+      }
+
       const parts = aspectType.split('.');
       const res = await catalog.getAspectType(parts[0], parts[1], parts[2]);
       if (!res.result) {
         throw new Error(`Unable to load type information for aspect type ${aspectType}`);
       }
       this._aspectTypes.set(res.result.name, res.result);
+      this._aspectTypes.set(aspectType, res.result);
     }
   }
 
@@ -232,7 +240,7 @@ export class CatalogSnapshot {
     }
 
     if (this.manifest.publishingConfig?.entries?.length &&
-        !this.manifest.publishingConfig.entries.includes(dataplex._nameToTypeRef(entry.type))) {
+        !this.manifest.publishingConfig.entries.includes(entry.type)) {
       return undefined;
     }
 
@@ -260,7 +268,7 @@ function toLocalEntry(entry: dataplex.Entry, localName: string): md.Entry {
 
   return {
       name: localName,
-      type: entry.entryType,
+      type: dataplex._nameToTypeRef(entry.entryType),
       resource: {
         name: entrySource.resource ?? undefined,
         displayName: entrySource.displayName ?? undefined,
@@ -305,18 +313,19 @@ function toServiceEntry(entry: md.Entry,
   }
 
   const resource = entry.resource ?? {};
+  const entryTypeName = dataplex._typeRefToName(entry.type, 'entry');
 
   if (manifest.source.ingestedEntries) {
     return {
       name: serviceName,
-      entryType: entry.type,
+      entryType: entryTypeName,
       aspects: aspects
     };
   }
 
   return {
     name: serviceName,
-    entryType: entry.type,
+    entryType: entryTypeName,
     parentEntry: resource.parent,
     entrySource: {
       resource: resource.name,

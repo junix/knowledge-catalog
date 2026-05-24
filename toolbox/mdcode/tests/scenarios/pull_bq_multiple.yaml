@@ -51,13 +51,13 @@ assert:
   fileSystem:
     catalog/p.d1.yaml:
       - contains: "name: p.d1"
-      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-dataset"
+      - contains: "type: dataplex-types.global.bigquery-dataset"
     catalog/p.d1/t1.yaml:
       - contains: "name: p.d1/t1"
-      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-table"
+      - contains: "type: dataplex-types.global.bigquery-table"
     catalog/p.d2.yaml:
       - contains: "name: p.d2"
-      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-dataset"
+      - contains: "type: dataplex-types.global.bigquery-dataset"
     catalog/p.d2/t2.yaml:
       - contains: "name: p.d2/t2"
-      - contains: "type: projects/dataplex-types/locations/global/entryTypes/bigquery-table"
+      - contains: "type: dataplex-types.global.bigquery-table"

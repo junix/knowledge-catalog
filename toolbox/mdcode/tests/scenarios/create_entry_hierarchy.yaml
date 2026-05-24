@@ -16,9 +16,9 @@ actions:
     name: aaa/bbb
     entry:
       name: aaa/bbb
-      type: projects/dataplex-types/locations/global/entryTypes/generic
+      type: p.global.generic
 
 assert:
   fileSystem:
     catalog/aaa/bbb.yaml:
-      contains: "type: projects/dataplex-types/locations/global/entryTypes/generic"
+      contains: "type: p.global.generic"

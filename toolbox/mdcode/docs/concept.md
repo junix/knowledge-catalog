@@ -157,10 +157,15 @@ structured configuration that can direct tools on handling the individual
 artifacts contained within the directory. It contains sub-directories that
 contain individual entries and entry links.
 
-Depending on the configured **layout** (see manifest below), files can be
-organized in two ways (and potentially extendable to other layouts in future):
+Depending on the **scope** (see manifest below), files are organized in one of
+two layout formats (and potentially extendable to other formats in future):
 
-**Standard Layout (Default):**
+**Standard Layout:**
+Used for `bq-dataset` and `entryGroup` scopes. This is a hybrid disk
+organization where the metadata structure is stored in a main YAML file per
+entry, and unstructured aspects (like Overview) are placed in sidecar Markdown
+files.
+
 ```
 path/to/root/
 ├── catalog.yaml                      # Catalog metadata, processing config/directives
@@ -171,7 +176,11 @@ path/to/root/
         └── <entry-id2>.<aspect>.md   # markdown sidecar files for unstructured aspects
 ```
 
-**Wiki/KB Layout:**
+**Documents Layout:**
+Used for `kb` scopes. This is a Markdown-first disk organization where the
+main entry is represented as a single Markdown file, with metadata structured in
+the YAML frontmatter and the main overview aspect promoted to the Markdown body.
+
 ```
 path/to/root/
 ├── catalog.yaml                      # Catalog metadata, processing config/directives
@@ -189,16 +198,19 @@ directories, organized according to the user's preferences.
 
 The manifest file captures all configuration related information. This includes:
 
-* The resource that the metadata snapshot corresponds to. This resource can
-  either be a resource identified in a source system such as BigQuery (e.g. a
-  Dataset, or a set of Tables, whose metadata is managed in Catalog in a system
-  EntryGroup, such as @bigquery), or a user-managed EntryGroup containing user
-  created entries.
+* The resource that the metadata snapshot corresponds to (the `scope`). This
+  resource can either be a resource identified in a source system such as BigQuery
+  (e.g. a Dataset, or a set of Tables, whose metadata is managed in Catalog in a
+  system EntryGroup, such as @bigquery), a user-managed EntryGroup containing
+  user created entries, or a user-managed EntryGroup representing a knowledge base containing markdown-based documentation entries.
 
-* The physical layout of the catalog snapshot on disk (either `standard` or `wiki`).
+* The physical layout of the catalog snapshot on disk is automatically determined
+  by the type of the scope:
+  * A `bq-dataset` or `entryGroup` scope uses the standard layout.
+  * A `kb` scope uses the wiki layout.
 
 * A set of type aliases to make it easy to refer to various catalog constructs
- such as entry-types, aspect-types, link-types, glossaries, glossary-terms, etc.
+  such as entry-types, aspect-types, link-types, glossaries, glossary-terms, etc.
 
 * The type of entries, aspects, and links to include into the local snapshot
   when downloading metadata from the service.
@@ -210,13 +222,12 @@ The manifest file captures all configuration related information. This includes:
 scope: <type>.<name>              # The resources in the snapshot. Examples:
                                   # scope: entryGroup.<projectId>.<locationId>.<entryGroupId>
                                   # scope: bq-dataset.<projectId>.<datasetId>
+                                  # scope: kb.<projectId>.<locationId>.<entryGroupId>
                                   # Or multiple BigQuery datasets in array list format:
                                   # scope:
                                   #   - bq-dataset.<projectId>.<datasetId1>
                                   #   - bq-dataset.<projectId>.<datasetId2>
 
-layout: standard                  # Optional. The disk layout style. Options: standard, wiki.
-                                  # Defaults to standard.
 
 aliases:                          # Optional. Can always use 3-part fully qualified references.
                                   # NOTE: All built-in types have predefined simple aliases.
@@ -293,29 +304,32 @@ conventions to apply here.
 
 ### File Extensions
 
-* **Standard Layout**: Entry files use the `.yaml` extension (e.g., `tableId.yaml`),
-with unstructured aspects optionally stored in sidecar `.md` files
-(e.g., `tableId.overview.md`).
+* **Standard Layout (for `bq-dataset` and `entryGroup` scopes)**: Entry files
+use the `.yaml` extension (e.g., `tableId.yaml`), with unstructured aspects
+optionally stored in sidecar `.md` files (e.g., `tableId.overview.md`).
 
-* **Markdown-only Layout**: Entry files use the `.md` extension (e.g., `tableId.md`),
-where the main YAML entry is replaced with a single markdown file containing YAML
-frontmatter and the promoted unstructured aspect (`Overview.content`) as its body.
+* **Document Layout (for `kb` scopes)**: Entry files use the `.md` extension
+(e.g., `tableId.md`), where the main YAML entry is replaced with a single
+markdown file containing YAML frontmatter and the promoted unstructured aspect
+(`Overview.content`) as its body.
 
 ### Entry File Layouts
 
-Metadata files are primarily structured representations of entry catalog info and
-aspects. Depending on the selected layout, the organization of these files differs:
+Metadata files are primarily structured representations of entry catalog info
+and aspects. Depending on the scope, the organization of these files differs:
 
-* **Standard Layout (YAML + Markdown sidecars)**: Every entry is represented by at
-least a single YAML file (`<entry-id>.yaml`) that captures entry metadata,
-information about associated resource, and all aspects and links. Aspects containing
-unstructured rich-text fields (like `overview`) are split into sidecar markdown files
+* **Standard Layout (YAML + Markdown sidecars)**: Used for `bq-dataset` and
+`entryGroup` scopes. Every entry is represented by at least a single YAML file
+(`<entry-id>.yaml`) that captures entry metadata, information about associated
+resource, and all aspects and links. Aspects containing unstructured rich-text
+fields (like `overview`) are split into sidecar markdown files
 (e.g., `<entry-id>.overview.md`).
 
-* **Wiki Layout (Markdown Only)**: The main YAML file is replaced with a single markdown file
-(`<entry-id>.md`). The structured YAML metadata moves entirely to the
-YAML frontmatter of this markdown file, and the unstructured text of the
-`overview.content` aspect becomes the main markdown body of the file.
+* **Document Layout (Markdown Only)**: Used for `kb` scopes. The main YAML file is
+replaced with a single markdown file (`<entry-id>.md`). The structured YAML
+metadata moves entirely to the YAML frontmatter of this markdown file, and the
+unstructured text of the `overview.content` aspect becomes the main markdown
+body of the file.
 
 #### Standard Layout
 
@@ -560,16 +574,15 @@ userManaged: false
 [guidelines.instructions]
 ```
 
-### Wiki Knowledge Base
+### Knowledge Base
 
 Assume the user is managing a knowledge base of information managed in a hierarchical
 structure. Or alternatively, an agent is building this knowledge base from previously
 aggregated or enriched metadata.
 
-**wiki/catalog.yaml**
+**workspace/catalog.yaml**
 ```yaml
-scope: entryGroup.ecommerce-prod.global.wiki
-layout: wiki             # Configured to use wiki layout
+scope: kb.ecommerce-prod.global.mbr-kb
 
 snapshot:
   entries:
@@ -582,7 +595,7 @@ publishing:
   - overview
 ```
 
-**wiki/catalog/products.md**
+**workspace/catalog/products.md**
 ```markdown
 ---
 id: products
@@ -592,7 +605,7 @@ updateTime: <updateTime>
 
 resource:
   name: products
-  displayName: Wiki Produc  ts
+  displayName: Products
   description: ...
 ---
 # Products Data

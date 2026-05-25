@@ -2,14 +2,13 @@
 //
 
 import * as fs from 'node:fs';
-import * as glob from 'glob';
 import * as path from 'node:path';
-import * as yaml from 'yaml';
 
 import * as gcp from './gcp/context';
 import * as dataplex from './gcp/dataplex';
 import * as md from './metadata';
 import { CatalogManifest } from './manifest';
+import { CatalogLayout, createLayout } from './layout';
 
 
 export class CatalogSnapshot {
@@ -17,13 +16,17 @@ export class CatalogSnapshot {
   public readonly manifest: CatalogManifest;
   public readonly basePath: string;
 
-  private _index: Map<string, string> = new Map();
-  private _entryTypes: Map<string, dataplex.EntryType> = new Map();
-  private _aspectTypes: Map<string, dataplex.AspectType> = new Map();
+  private readonly _entryTypes: Map<string, dataplex.EntryType> = new Map();
+  private readonly _aspectTypes: Map<string, dataplex.AspectType> = new Map();
 
-  constructor(basePath: string, manifest: CatalogManifest) {
+  private readonly _layout: CatalogLayout;
+
+  private constructor(basePath: string, manifest: CatalogManifest) {
     this.basePath = basePath;
     this.manifest = manifest;
+
+    const catalogPath = path.join(this.basePath, 'catalog');
+    this._layout = createLayout(manifest.source.layout, catalogPath, manifest.source);
   }
 
   static async fromPath(basePath: string, ctx: gcp.ApiContext): Promise<CatalogSnapshot> {
@@ -36,7 +39,7 @@ export class CatalogSnapshot {
     const snapshot = new CatalogSnapshot(basePath, manifest);
 
     await snapshot._buildTypes(manifest, ctx);
-    await snapshot._buildIndex();
+    await snapshot._layout.init();
     return snapshot;
   }
 
@@ -50,18 +53,12 @@ export class CatalogSnapshot {
 
   // Retrieves the list of locally (pulled and/or created) managed entries
   async listEntries(): Promise<string[]> {
-    return Array.from(this._index.keys());
+    return this._layout.listEntries();
   }
 
   // Retrieves the local copy of the entry using its local name
   async lookupEntry(name: string): Promise<md.Entry> {
-    const entryPath = this._index.get(name);
-    if (!entryPath || !fs.existsSync(entryPath)) {
-      throw new Error(`Entry not found: ${name}`);
-    }
-
-    const content = await fs.promises.readFile(entryPath, 'utf8');
-    return yaml.parse(content) as md.Entry;
+    return await this._layout.loadEntry(name);
   }
 
   // Updates the locally managed entry, referenced by its local name.
@@ -69,10 +66,7 @@ export class CatalogSnapshot {
   // (which is relevant in case of non-ingested entries) or an aspect identified by it
   // key (project.location.type).
   async updateEntry(entry: md.Entry, fields: string[]): Promise<void> {
-    const existingEntry = await this.lookupEntry(entry.name);
-    if (!existingEntry) {
-      throw new Error(`Entry not found: ${entry.name}`);
-    }
+    const existingEntry = await this._layout.loadEntry(entry.name);
 
     for (const f of fields) {
       if (f == 'resource') {
@@ -106,8 +100,7 @@ export class CatalogSnapshot {
       }
     }
 
-    const entryPath = path.resolve(this.basePath, 'catalog', entry.name + '.yaml');
-    await fs.promises.writeFile(entryPath, yaml.stringify(existingEntry));
+    await this._layout.saveEntry(entry.name, existingEntry);
   }
 
   // Creates an entry within the locally catalog snapshot. This capabilitiy is only supported
@@ -119,15 +112,11 @@ export class CatalogSnapshot {
 
     // TODO: Validate aspect and other things
 
-    let entryPath = this._index.get(name);
-    if (entryPath && fs.existsSync(entryPath)) {
+    if (this._layout.entryExists(name)) {
        throw new Error(`Entry '${name}' already exists`);
     }
-    entryPath = path.resolve(this.basePath, 'catalog', name + '.yaml');
 
-    await fs.promises.mkdir(path.dirname(entryPath), { recursive: true });
-    await fs.promises.writeFile(entryPath, yaml.stringify(entry));
-    this._index.set(name, entryPath);
+    await this._layout.saveEntry(name, entry);
   }
 
   // Deletes an entry within the locally catalog snapshot. This capabilitiy is only supported
@@ -137,40 +126,7 @@ export class CatalogSnapshot {
       throw new Error(`Entry cannot be deleted as entries are ingested.`);
     }
 
-    const entryPath = this._index.get(name);
-    if (entryPath && fs.existsSync(entryPath)) {
-      await fs.promises.unlink(entryPath);
-    }
-    this._index.delete(name);
-  }
-
-  // Build an index of local entry name -> file path
-  private async _buildIndex(): Promise<void> {
-    const catalogPath = path.join(this.basePath, 'catalog');
-    if (!fs.existsSync(catalogPath)) {
-      return;
-    }
-
-    const matches = await glob.glob('**/*.yaml', {
-      cwd: catalogPath,
-      absolute: true,
-      nodir: true,
-    });
-
-    for (const localPath of matches) {
-      try {
-        const content = await fs.promises.readFile(localPath, 'utf8');
-        const metadata = yaml.parse(content);
-        if (metadata && metadata.name) {
-          const localName = this.manifest.source.localName(metadata);
-          this._index.set(localName, localPath);
-        }
-      }
-      catch (err) {
-        // TODO: CLI should pass in error logger
-        // skip invalid yaml or unreadable files gracefully during indexing
-      }
-    }
+    await this._layout.deleteEntry(name);
   }
 
   // Build the map of types supported within the locally managed catalog snapshot
@@ -221,23 +177,13 @@ export class CatalogSnapshot {
   // This is only meant to be used within the syncing process (as part of pull operations).
   async _storeEntry(entry: dataplex.Entry): Promise<void> {
     const localName = this.manifest.source.localName(entry);
-    let entryPath = this._index.get(localName);
-    if (!entryPath) {
-      entryPath = path.resolve(this.basePath, 'catalog', localName + '.yaml');
-    }
-
-    await fs.promises.mkdir(path.dirname(entryPath), { recursive: true });
-    await fs.promises.writeFile(entryPath, yaml.stringify(toLocalEntry(entry, localName)));
-    this._index.set(localName, entryPath);
+    await this._layout.saveEntry(localName, toLocalEntry(entry, localName));
   }
 
   // Fetches a Dataplex entry from its local metadata representation.
   // This is only meant to be used within the syncing process (as part of push operations).
   async _fetchEntry(name: string): Promise<dataplex.Entry | undefined> {
-    const entry = await this.lookupEntry(name);
-    if (!entry) {
-      throw new Error(`Entry not found: ${name}`);
-    }
+    const entry = await this._layout.loadEntry(name);
 
     if (this.manifest.publishingConfig?.entries?.length &&
         !this.manifest.publishingConfig.entries.includes(entry.type)) {
@@ -315,7 +261,8 @@ function toServiceEntry(entry: md.Entry,
   const resource = entry.resource ?? {};
   const entryTypeName = dataplex._typeRefToName(entry.type, 'entry');
 
-  if (manifest.source.ingestedEntries) {
+  if (manifest.source.ingestedEntries ||
+      !entry.resource || !Object.keys(entry.resource).length) {
     return {
       name: serviceName,
       entryType: entryTypeName,

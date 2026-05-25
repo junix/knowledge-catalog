@@ -16,8 +16,8 @@ To ensure consistency, the following terms are used:
 *   **Catalog Snapshot**: A directory on the local filesystem containing a subset of Knowledge Catalog metadata.
 *   **Manifest (catalog.yaml)**: A file in the snapshot root that captures sync configuration and directives.
 *   **Scope**: A unified identifier format (`<type>.<name>`) that establishes the single target resource for the snapshot in the manifest.
-*   **Standard Layout**: A hybrid disk organization where metadata structure is stored in a YAML file per entry, and unstructured aspects are placed in sidecar Markdown files.
-*   **Wiki Layout**: A Markdown-only disk organization where the main entry is represented as a single Markdown file, with metadata structured in the YAML frontmatter and the main overview aspect promoted to the Markdown body.
+*   **Standard Layout**: A hybrid disk organization automatically used for `bq-dataset` and `entryGroup` scopes where metadata structure is stored in a YAML file per entry, and unstructured aspects are placed in sidecar Markdown files.
+*   **Documents Layout**: A Markdown-only disk organization automatically used for `kb` scopes where the main entry is represented as a single Markdown file, with metadata structured in the YAML frontmatter and the main overview aspect promoted to the Markdown body.
 *   **Entry**: A representation of a resource (like a table or dataset) in the Knowledge Catalog.
 *   **Aspect**: A specific type of metadata attached to an entry (e.g., description, profile).
 *   **Sidecar File**: An auxiliary file (e.g., Markdown) used for aspects with unstructured text.
@@ -28,9 +28,9 @@ To ensure consistency, the following terms are used:
 The following core decisions have been established:
 
 ### 3.1. Metadata Representation
-We will support configurable disk organization layouts:
-*   **Standard Layout**: Structured data (entry metadata, resource info, aspects like schema and profile) is stored in a main YAML file per entry, while unstructured rich-text fields (like Overview) are stored in dedicated sidecar Markdown files.
-*   **Wiki Layout**: Structured metadata is stored within the YAML frontmatter of a single `.md` file per entry, and the primary unstructured aspect (`overview.content`) is promoted to serve as the main Markdown body of that file. Other unstructured aspects may still use sidecars.
+The disk organization layout is automatically determined by the scope type:
+*   **Standard Layout** (used for `bq-dataset` and `entryGroup` scopes): Structured data (entry metadata, resource info, aspects like schema and profile) is stored in a main YAML file per entry, while unstructured rich-text fields (like Overview) are stored in dedicated sidecar Markdown files.
+*   **Documents Layout** (used for `kb` scopes): Structured metadata is stored within the YAML frontmatter of a single `.md` file per entry, and the primary unstructured aspect (`overview.content`) is promoted to serve as the main Markdown body of that file. Other unstructured aspects may still use sidecars.
 
 ### 3.2. Synchronization Model
 We will support a bi-directional sync (Pull and Push) with the following rules:
@@ -86,8 +86,8 @@ To validate the design, we will implement test cases covering the following area
 *   **Entry and aspect varieties**: Both Dataplex-defined entries/aspects (where required aspects are read-only) and user-defined ones (where required aspects are modifiable).
 
 ### 5.2. Format Mapping
-*   **Standard Layout**: Aspects managed correctly within the main YAML file, and unstructured text mapped correctly to/from sidecar Markdown files.
-*   **Wiki Layout**: Metadata mapped correctly to/from YAML frontmatter, and the `overview.content` aspect promoted to/from the Markdown file body.
+*   **Standard Layout** (for `bq-dataset` and `entryGroup` scopes): Aspects managed correctly within the main YAML file, and unstructured text mapped correctly to/from sidecar Markdown files.
+*   **Documents Layout** (for `kb` scopes): Metadata mapped correctly to/from YAML frontmatter, and the `overview.content` aspect promoted to/from the Markdown file body.
 
 ### 5.3. Directory Organization
 *   **BQ Resource Hierarchy**: Testing layout for BigQuery datasets.

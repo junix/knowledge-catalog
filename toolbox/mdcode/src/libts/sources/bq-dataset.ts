@@ -3,12 +3,15 @@
 
 import * as gcp from '../gcp';
 import * as bq from '../gcp/bigquery';
+import { Layouts } from '../layout';
+import { CatalogSource } from '../source';
 
 
-export class BigQueryDatasetSource {
+export class BigQueryDatasetSource implements CatalogSource {
   readonly type: string;
   readonly name: string;
   readonly ingestedEntries = true;
+  readonly layout = Layouts.STANDARD;
 
   private readonly _datasets: Map<string, bq.Dataset>;
 

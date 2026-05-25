@@ -83,7 +83,9 @@ export class CatalogSync {
       }
 
       if (!this._snapshot.manifest.source.ingestedEntries) {
-        updateMask.push('entry_source');
+        if (entry.entrySource) {
+          updateMask.push('entry_source');
+        }
       }
 
       if (!updateMask.length) {

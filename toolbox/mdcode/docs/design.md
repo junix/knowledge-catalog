@@ -17,9 +17,9 @@ The system is divided into two public interface layers and a core library founda
 
 ### 1.2 Core Library Foundation (`kc-mac`)
 The brain of the operation, containing the following modules:
-- **`CatalogManifest`**: Handles loading, validating, and parsing the `catalog.yaml` project manifest, including parsing the unified `scope` specification and the `layout` format (`standard` or `wiki`).
+- **`CatalogManifest`**: Handles loading, validating, and parsing the `catalog.yaml` project manifest, including parsing the unified `scope` specification (which determines the layout style).
 - **`CatalogSnapshot`**: Manages local catalog entries and coordinates high-level read/write/list logic by delegating physical file representation and layout-specific tasks to `CatalogLayout`.
-- **`CatalogLayout`**: Abstract class defining the operations to list, read, write, and delete files on the local disk. Standard and Wiki layouts implement this interface.
+- **`CatalogLayout`**: Abstract class defining the operations to list, read, write, and delete files on the local disk. Standard and Wiki layouts implement this interface, automatically selected based on the scope type.
 - **`CatalogSync`**: Orchestrates pull and push sync directions, handles pagination, fail-fast conflict detection, and manages tool state in a separate state file (`.catalog.state`).
 - **`CatalogService`**: Wrapper for raw HTTP API calls, handling Application Default Credentials (ADC) auth and LRO polling.
 
@@ -35,7 +35,8 @@ This section describes the directory structure for the project source code, refl
   - **`libts/`**: The TypeScript core library.
     - **`index.ts`**: The main entry point exporting public APIs.
     - **`manifest.ts`**: Contains the `CatalogManifest` class logic.
-    - **`layout.ts`**: Contains the `CatalogLayout` abstract base class and the layout-specific concrete implementations (`StandardLayout` and `WikiLayout`).
+    - **`layout.ts`**: Contains the `CatalogLayout` interface.
+    - **`source.ts`**: Contains the `CatalogSource` interface.
     - **`snapshot.ts`**: Contains the `CatalogSnapshot` class logic.
     - **`sync.ts`**: Contains the `CatalogSync` class logic.
     - **`gcp/`**: Subfolder for GCP-specific functionality.
@@ -43,9 +44,12 @@ This section describes the directory structure for the project source code, refl
       - **`context.ts`**: Contains the `ApiContext` class.
       - **`dataplex.ts`**: Contains the API client for Knowledge Catalog.
     - **`sources/`**: Subfolder containing source-specific implementations.
-      - **`types.ts`**: Defines source type constants and source interface.
       - **`entrygroup.ts`**: Encapsulates behavior for Dataplex EntryGroups.
       - **`bq-dataset.ts`**: Encapsulates behavior for BigQuery datasets.
+      - **`wiki.ts`**: Encapsulates behavior for Wikis.
+    - **`layouts/`**: Subfolder containing layout-specific implementations.
+      - **`standard.ts`**: Encapsulates behavior for Standard layout.
+      - **`documents.ts`**: Encapsulates behavior for Wiki layout.
 
 ## 3. Public API, CLI, and MCP Structure
 
@@ -54,6 +58,7 @@ This section describes the directory structure for the project source code, refl
 **`CatalogManifest`**
 - `static initWithEntryGroup(entryGroup: string, ctx: ApiContext): CatalogManifest`
 - `static initWithBigQuery(dataset: string, ctx: ApiContext): CatalogManifest`
+- `static initWithKB(kb: string, ctx: ApiContext): CatalogManifest`
 - `static load(path: string, ctx: ApiContext): Promise<CatalogManifest>`
 - `save(path: string): void`
 
@@ -71,7 +76,7 @@ This section describes the directory structure for the project source code, refl
 
 **`CatalogSnapshot`**
 - `static fromPath(path: string): CatalogSnapshot`
-- `layout: CatalogLayout`: The layout strategy instance initialized based on the manifest layout configuration.
+- `layout: CatalogLayout`: The layout strategy instance initialized based on the manifest scope.
 - `list(): Promise<string[]>`: Returns a list of entry IDs in the snapshot by delegating to `layout.list(snapshotPath)`.
 - `lookupEntry(entryId: string): Promise<Entry>`: Returns structured metadata for a specific entry by delegating to `layout.readEntry(snapshotPath, entryId)`.
 - `updateEntry(entryId: string, updates: Record<string, any>): Promise<void>`: Merges updates into the entry metadata and aspect values, and commits the result via `layout.writeEntry(snapshotPath, entryId, entry)`.
@@ -86,7 +91,7 @@ This section describes the directory structure for the project source code, refl
 
 ### 2.2 CLI Command Structure (`kcmd`)
 
-- `kcmd init [--bigquery-dataset <id>] [--entry-group <id>]`
+- `kcmd init [--bigquery-dataset <id>] [--entry-group <id>] [--kb <id>]`
 - `kcmd pull [--dry-run]`
 - `kcmd push [--dry-run] [--force] [--validate-only]`
 - `kcmd status`

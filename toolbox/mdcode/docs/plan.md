@@ -6,7 +6,7 @@ This document outlines the phased delivery plan for building the Metadata as Cod
 Establish the local file structure by pulling metadata using the TypeScript library, and enable reading that snapshot via MCP. Support early distribution.
 
 *   **Key Features & Work:**
-    *   **Library (TS)**: Fetch metadata for a BigQuery dataset or Dataplex EntryGroup; create local directory structure mirroring the resource hierarchy; generate main YAML file per entry; paginated pull; ADC authentication.
+    *   **Library (TS)**: Fetch metadata for a BigQuery dataset or Dataplex EntryGroup; create local directory structure mirroring the resource hierarchy; generate main YAML file per entry (Standard layout); paginated pull; ADC authentication.
     *   **CLI (TS-based)**: Implement `kcmd init` and a basic read-only `kcmd pull`.
     *   **MCP (TS-based)**: Implement an MCP server with tools: `list-entries` and `lookup-entry` (reading from the local snapshot).
     *   **Distribution**: Support installation from source repository or local package for early access.
@@ -25,10 +25,10 @@ Complete the bi-directional sync by enabling local modifications to be pushed ba
 Optimize the file format for human and agent editing. Update interfaces to support the new formats and layout options.
 
 *   **Key Features & Work:**
-    *   **Library (TS)**: Support `layout` property in `catalog.yaml` (options: `standard`, `wiki`); implement the `CatalogLayout` abstraction (`layout.ts`) and its concrete layouts (`StandardLayout` and `WikiLayout`); refactor `CatalogSnapshot` to delegate filesystem list, read, and write operations to the active layout implementation; support type aliases in `catalog.yaml`, including built-in aliases for built-in types.
-    *   **CLI (TS-based)**: Update `pull` and `push` operations to handle sidecars, aliases, and different layouts (`standard`/`wiki`) correctly.
-    *   **MCP (TS-based)**: Ensure `list-entries` and `lookup-entry` tools correctly handle layouts (by delegating via `CatalogSnapshot` to `CatalogLayout`).
-    *   **Testing**: Implement test cases for format mapping, including Standard layout (YAML + sidecars) and Wiki layout (Markdown + frontmatter), and validate that `CatalogSnapshot` interacts correctly with both layouts. Implement test cases for aliases.
+    *   **Library (TS)**: Support `kb` scope type alongside `bq-dataset` and `entryGroup` in `catalog.yaml`; implement the `CatalogLayout` abstraction (`layout.ts`) and its concrete layouts (`StandardLayout` and `DocumentsLayout`); refactor `CatalogSnapshot` to delegate filesystem list, read, and write operations to the active layout strategy (automatically instantiated based on the scope); support type aliases in `catalog.yaml`, including built-in aliases for built-in types.
+    *   **CLI (TS-based)**: Update `pull` and `push` operations to handle sidecars, aliases, and different layout scopes correctly.
+    *   **MCP (TS-based)**: Ensure `list-entries` and `lookup-entry` tools correctly handle layouts (by delegating via `CatalogSnapshot` to `CatalogLayout` strategy).
+    *   **Testing**: Implement test cases for format mapping, including Standard layout (YAML + sidecars) and Documents layout (Markdown + frontmatter), and validate that `CatalogSnapshot` interacts correctly with both layouts based on the active scope type. Implement test cases for aliases.
 
 ## Phase 4: Robust Sync and State Management
 Ensure data integrity and efficient updates.

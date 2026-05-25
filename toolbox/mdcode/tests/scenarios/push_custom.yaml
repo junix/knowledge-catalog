@@ -24,7 +24,7 @@ actions:
   - action: updateEntry
     entry:
       name: custom-entry
-      type: projects/p/locations/global/entryTypes/custom-type
+      type: p.global.custom-type
       resource:
         description: New custom description
     fields:
@@ -35,7 +35,7 @@ assert:
   fileSystem:
     catalog/custom-entry.yaml:
       - contains: "name: custom-entry"
-      - contains: "New custom description"
+      - contains: "description: New custom description"
   catalog:
     entries:
       - name: projects/p/locations/us/entryGroups/custom-group/entries/custom-entry

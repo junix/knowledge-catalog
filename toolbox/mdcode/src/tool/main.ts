@@ -10,17 +10,9 @@ const cli = cac.cac('kcmd').version('1.0.0').help();
 cli.command('init', 'Initialize a new catalog snapshot')
    .option('--entry-group <id>', 'Identifier of the EntryGroup (project.location.id)')
    .option('--bigquery-dataset <id...>', 'Identifier of the BigQuery dataset(s) (project.datasetId)')
+   .option('--kb <id>', 'Identifier of the Knowledge Base EntryGroup (project.location.id)')
    .option('--pull', 'Optionally pull catalog entries during initialization')
    .action(async (options) => {
-      if (!options.entryGroup && !options.bigqueryDataset) {
-        console.error('Error: Must provide either --entry-group or --bigquery-dataset');
-        process.exit(1);
-      }
-      if (options.entryGroup && options.bigqueryDataset) {
-        console.error('Error: Cannot provide both --entry-group and --bigquery-dataset');
-        process.exit(1);
-      }
-
       try {
         await commands.init(options);
       }

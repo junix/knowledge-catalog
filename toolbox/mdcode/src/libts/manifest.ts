@@ -61,6 +61,11 @@ export class CatalogManifest {
     return new CatalogManifest(source);
   }
 
+  static async initWithKnowledgeBase(name: string, ctx: gcp.ApiContext): Promise<CatalogManifest> {
+    const source = await createSource(Sources.KB, name, ctx);
+    return new CatalogManifest(source);
+  }
+
   static async load(path: string, ctx: gcp.ApiContext): Promise<CatalogManifest> {
     const content = fs.readFileSync(path, 'utf8');
     const parsed = yaml.parse(content);
@@ -77,7 +82,6 @@ export class CatalogManifest {
         throw new Error('Manifest error: scope array cannot be empty.');
       }
 
-
       const datasets: string[] = [];
       for (const s of scope) {
         const dotIndex = s.indexOf('.');
@@ -87,7 +91,7 @@ export class CatalogManifest {
         const type = s.substring(0, dotIndex);
         const name = s.substring(dotIndex + 1);
         if (type !== Sources.BIGQUERY_DATASET) {
-          throw new Error(`Manifest error: only BigQuery datasets are allowed in multiple scopes. Found type '${type}'.`);
+          throw new Error(`Manifest error: Unsupported scope type in multiple scopes: '${type}'.`);
         }
         datasets.push(name);
       }

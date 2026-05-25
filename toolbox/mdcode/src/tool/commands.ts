@@ -11,6 +11,7 @@ import * as context from '../libts/gcp/context';
 export interface InitOptions {
   entryGroup?: string;
   bigqueryDataset?: string | string[];
+  kb?: string;
   pull?: boolean;
 }
 
@@ -28,7 +29,10 @@ export async function init(options: InitOptions): Promise<number> {
   if (options.entryGroup) {
     manifest = await kcmd.CatalogManifest.initWithEntryGroup(options.entryGroup, ctx);
   }
-  else {
+  else if (options.kb) {
+    manifest = await kcmd.CatalogManifest.initWithKnowledgeBase(options.kb, ctx);
+  }
+  else if (options.bigqueryDataset) {
     let datasets = '';
     if (Array.isArray(options.bigqueryDataset)) {
       datasets = options.bigqueryDataset.join(',');
@@ -37,6 +41,10 @@ export async function init(options: InitOptions): Promise<number> {
       datasets = options.bigqueryDataset!;
     }
     manifest = await kcmd.CatalogManifest.initWithBigQuery(datasets, ctx);
+  }
+  else {
+    console.error('Error: Must provide either --entry-group or --bigquery-dataset or --kb');
+    return 1;
   }
 
   manifest.save('catalog.yaml');

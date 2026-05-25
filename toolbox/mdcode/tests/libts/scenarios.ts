@@ -79,6 +79,11 @@ function runScenario(scenario: any) {
           scenario.init.dataset, TEST_API_CONTEXT);
         mf.save('/catalog.yaml');
       }
+      if (scenario.init?.kb) {
+        const mf = await kcmac.CatalogManifest.initWithKnowledgeBase(
+          scenario.init.kb, TEST_API_CONTEXT);
+        mf.save('/catalog.yaml');
+      }
 
       // Execute - Snapshot creation
       if (!fs.existsSync('/catalog.yaml')) {

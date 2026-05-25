@@ -1,4 +1,4 @@
-// Dataplex EntryGroup as Metadata Source
+// Dataplex Wiki managed as an EntryGroup as Metadata Source
 //
 
 import * as gcp from '../gcp';
@@ -7,11 +7,11 @@ import { Layouts } from '../layout';
 import { CatalogSource } from '../source';
 
 
-export class EntryGroupSource implements CatalogSource {
+export class KnowledgeBaseSource implements CatalogSource {
   readonly type: string;
   readonly name: string;
-  readonly ingestedEntries: boolean;
-  readonly layout = Layouts.STANDARD;
+  readonly ingestedEntries = false;
+  readonly layout = Layouts.DOCUMENTS;
 
   private readonly _name: string[];
   private readonly _entryGroup: dataplex.EntryGroup;
@@ -22,8 +22,6 @@ export class EntryGroupSource implements CatalogSource {
 
     this._name = name.split('.');
     this._entryGroup = entryGroup;
-
-    this.ingestedEntries = this._name[2].startsWith('@');
   }
 
   async *entries(ctx: gcp.ApiContext): AsyncGenerator<gcp.Entry, void, unknown> {

@@ -4,23 +4,27 @@
 import * as gcp from './gcp';
 import * as bq from './gcp/bigquery';
 import * as dataplex from './gcp/dataplex';
+import { Layouts } from './layout';
 import { EntryGroupSource } from './sources/entrygroup';
 import { BigQueryDatasetSource } from './sources/bq-dataset';
+import { KnowledgeBaseSource } from './sources/kb';
+
+export enum Sources {
+  ENTRYGROUP = 'entryGroup',
+  BIGQUERY_DATASET = 'bq-dataset',
+  KB = 'kb'
+}
 
 
 export interface CatalogSource {
   readonly type: string;
   readonly name: string;
   readonly ingestedEntries: boolean;
+  readonly layout: Layouts;
 
   entries(ctx: gcp.ApiContext): AsyncGenerator<gcp.Entry, void, unknown>;
   localName(entry: gcp.Entry): string;
   serviceName(localName: string): string;
-}
-
-export enum Sources {
-  ENTRYGROUP = 'entryGroup',
-  BIGQUERY_DATASET = 'bq-dataset',
 }
 
 
@@ -72,6 +76,9 @@ export async function createSource(type: string, name: string,
     case Sources.BIGQUERY_DATASET:
       const datasets = await getBigQueryDatasets(name, ctx);
       return new BigQueryDatasetSource(Sources.BIGQUERY_DATASET, name, datasets);
+    case Sources.KB:
+      const knowledgeBase = await getEntryGroup(name, ctx);
+      return new KnowledgeBaseSource(Sources.KB, name, knowledgeBase);
     default:
       throw new Error(`Unknown source type: ${type}`);
   }

@@ -95,7 +95,7 @@ snapshot:
   entries:
     - dataplex-types.global.bigquery-dataset
     - dataplex-types.global.bigquery-table
-  aspect:
+  aspects:
     - dataplex-types.global.overview
 EOF
 
@@ -146,8 +146,8 @@ information from a directory hierarchy of markdown files:
   along with matching line numbers and line snippets. This can be used to quickly
   find matches without having to list and read all files.
 
-To work with a fileset effectively create search queries (similar to grep) to find
-relevant files, and then read the files to find relevant information.
+To work with a fileset effectively create search queries (use simple keyword queries
+with individual tokens) to find relevant files, and then read the files to find relevant information. If one query does not work, try a few other keywords.
 EOF
 ```
 

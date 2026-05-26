@@ -4,7 +4,8 @@
 import * as fs from 'node:fs';
 import * as adk from '@google/adk';
 import * as kcmd from 'kcmd';
-import { rootAgent } from './agent.js';
+import { createAgent } from './agent.js';
+import { loadMcpTools, loadSkills } from '../tools';
 
 export interface EnrichOptions {
   catalogPath: string;
@@ -32,14 +33,11 @@ export async function enrichCommand(options: EnrichOptions) {
   }
 
   const commonPrompt = await fs.promises.readFile(options.promptPath, 'utf-8');
+  const mcpTools = await loadMcpTools(options.toolsPath);
+  const skills = await loadSkills(options.toolsPath);
 
   const context = kcmd.gcp.ApiContext.default();
   const catalog = await kcmd.CatalogSnapshot.fromPath(options.catalogPath, context);
-
-  const runner = new adk.InMemoryRunner({
-    agent: rootAgent,
-    appName: 'kcagent'
-  });
 
   const entryNames = await catalog.listEntries();
   for (const name of entryNames) {
@@ -50,14 +48,43 @@ export async function enrichCommand(options: EnrichOptions) {
       continue;
     }
 
+    const updateDocumentationTool = new adk.FunctionTool({
+      name: 'update_documentation',
+      description: 'Update the documentation of an asset',
+      parameters: {
+        type: 'OBJECT' as any,
+        properties: {
+          documentation: {
+            type: 'STRING' as any,
+            description: 'The new documentation content (Markdown format)',
+          },
+        },
+        required: ['documentation'],
+      },
+      execute: async (input: any) => {
+        console.log('Update tool called;')
+        const documentation = input.documentation as string;
+        entry.aspects = { ...(entry.aspects ?? {}) };
+        entry.aspects['dataplex-types.global.overview'] = {
+          content: documentation,
+          contentType: 'MARKDOWN'
+        };
+        await catalog.updateEntry(entry, ['dataplex-types.global.overview']);
+        return { result: 'Successfully updated documentation' };
+      },
+    });
+
+    const agent = createAgent([updateDocumentationTool, ...mcpTools, ...skills]);
+    const runner = new adk.InMemoryRunner({
+      agent: agent,
+      appName: 'kcagent'
+    });
+
     const events = runner.runEphemeral({
       userId: 'cli-user',
       newMessage: {
         role: 'user',
         parts: [{ text: createPrompt(entry, commonPrompt) }]
-      },
-      stateDelta: {
-        toolsPath: options.toolsPath
       }
     });
 

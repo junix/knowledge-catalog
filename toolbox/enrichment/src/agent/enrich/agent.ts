@@ -3,7 +3,7 @@
 
 import * as adk from '@google/adk';
 import * as kcmd from 'kcmd';
-import { ExtensibleAgent } from '../utils/agent.js';
+
 
 const NAME = 'kcagent-enrich';
 const MODEL = 'gemini-2.5-flash';
@@ -74,30 +74,35 @@ Workflow:
    content is based on actual information. Avoid making up information.
 
    If no additional information was found, and there should not be any documentation
-   updates, skip the following steps.
+   updates. Simply output that no information was found and documentation was not
+   updated. Skip the following steps.
 
-3. Review the generated documentation to ensure it is succinct, and easy to
-   consume, and clear and uses unambiguous language.
+3. Review and revise the generated documentation to ensure it is succinct, and easy
+   to consume, and clear, and uses unambiguous language.
 
-4. Finally generate the updated documentation for the user to view.
+4. Invoke the 'update_documentation' tool with the updated documentation.
+   Finally, output a message saying the documentation has been updated.
 `;
 
 const apiContext = kcmd.gcp.ApiContext.default();
 
-export const rootAgent = new ExtensibleAgent({
-  name: NAME,
-  description: DESCRIPTION,
-  instruction: PROMPT,
-  model: new adk.Gemini({
-    model: MODEL,
-    vertexai: true,
-    project: apiContext.project,
-    location: apiContext.location,
-  }),
-  generateContentConfig: {
-    thinkingConfig: {
-      includeThoughts: true,
-      thinkingBudget: -1,
+export function createAgent(tools: adk.ToolUnion[]): adk.Agent {
+  return new adk.Agent({
+    name: NAME,
+    description: DESCRIPTION,
+    instruction: PROMPT,
+    tools: tools,
+    model: new adk.Gemini({
+      model: MODEL,
+      vertexai: true,
+      project: apiContext.project,
+      location: apiContext.location,
+    }),
+    generateContentConfig: {
+      thinkingConfig: {
+        includeThoughts: true,
+        thinkingBudget: -1,
+      },
     },
-  },
-});
+  });
+}

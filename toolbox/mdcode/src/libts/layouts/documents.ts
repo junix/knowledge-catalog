@@ -9,6 +9,7 @@ import * as md from '../metadata';
 import { CatalogLayout } from '../layout';
 
 const OVERVIEW_ASPECT_KEY = 'dataplex-types.global.overview';
+const DEFAULT_ENTRY_TYPE = 'dataplex-types.global.generic';
 
 
 export class DocumentsLayout implements CatalogLayout {
@@ -35,16 +36,8 @@ export class DocumentsLayout implements CatalogLayout {
     });
 
     for (const localPath of matches) {
-      try {
-        const content = await fs.promises.readFile(localPath, 'utf8');
-        const { entry } = parseMarkdown(content);
-        if (entry && entry.name) {
-          this._index.set(entry.name, localPath);
-        }
-      }
-      catch (err) {
-        // Skip unreadable/invalid files during indexing
-      }
+      const name = deriveEntryNameFromPath(localPath, this._catalogPath);
+      this._index.set(name, localPath);
     }
   }
 
@@ -63,12 +56,15 @@ export class DocumentsLayout implements CatalogLayout {
       throw new Error(`Entry not found: ${name}`);
     }
     const content = await fs.promises.readFile(entryPath, 'utf8');
-    const { entry, body } = parseMarkdown(content);
+    const { entry: parsed, body } = parseMarkdown(content);
 
-    if (!entry) {
-      throw new Error(`Missing YAML frontmatter in Markdown file: ${entryPath}`);
-    }
-    
+    const entry: md.Entry = parsed ?? ({ type: DEFAULT_ENTRY_TYPE, resource: {} } as md.Entry);
+    entry.name = name;
+
+    // Ensure the entry's type aspect is present — Dataplex create requires it.
+    entry.aspects = entry.aspects ?? {};
+    entry.aspects[entry.type] = entry.aspects[entry.type] ?? {};
+
     const bodyTrimmed = body.trim();
     if (bodyTrimmed) {
       if (!entry.aspects) {
@@ -117,6 +113,11 @@ export class DocumentsLayout implements CatalogLayout {
   }
 }
 
+function deriveEntryNameFromPath(absolutePath: string, catalogPath: string): string {
+  const rel = path.relative(catalogPath, absolutePath);
+  return rel.replace(/\.md$/, '');
+}
+
 export function parseMarkdown(content: string): { entry: md.Entry|null; body: string } {
   const lines = content.split(/\r?\n/);
   if (lines[0] !== '---') {
@@ -132,7 +133,9 @@ export function parseMarkdown(content: string): { entry: md.Entry|null; body: st
   const body = lines.slice(endIndex + 1).join('\n');
 
   const entry = (metadata.catalogEntry ?? {}) as md.Entry;
-  entry.type = metadata.type;
+  entry.type = (typeof metadata.type === 'string' && metadata.type.split('.').length === 3)
+    ? metadata.type
+    : DEFAULT_ENTRY_TYPE;
   entry.resource = entry.resource ?? {}
   entry.resource.displayName = metadata.title;
   entry.resource.description = metadata.description;
@@ -174,6 +177,7 @@ export function toMarkdown(entry: md.Entry, body: string): string {
     catalogEntry: entryClone
   };
 
+  delete entryClone.name;
   delete entryClone.resource.displayName;
   delete entryClone.resource.description;
   delete entryClone.resource.updateTime;

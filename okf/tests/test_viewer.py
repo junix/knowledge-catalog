@@ -27,7 +27,7 @@ def _make_bundle(root: Path) -> None:
         tags: [test]
         timestamp: '2026-05-28T00:00:00+00:00'
         ---
-        Parent dataset for [users](/tables/users.md).
+        Parent dataset for [users](../tables/users.md).
         """,
     )
     _write(
@@ -41,7 +41,7 @@ def _make_bundle(root: Path) -> None:
         tags: [users]
         timestamp: '2026-05-28T00:00:00+00:00'
         ---
-        Joinable with [events](/tables/events.md) and see [DAU](/references/metrics/dau.md).
+        Joinable with [events](events.md) and see [DAU](../references/metrics/dau.md).
         """,
     )
     _write(
@@ -55,7 +55,7 @@ def _make_bundle(root: Path) -> None:
         tags: [events]
         timestamp: '2026-05-28T00:00:00+00:00'
         ---
-        See [users](/tables/users.md).
+        See [users](users.md).
         """,
     )
     _write(
@@ -138,7 +138,7 @@ def test_missing_link_targets_are_skipped(tmp_path: Path):
         description: Has a dangling link.
         timestamp: '2026-05-28T00:00:00+00:00'
         ---
-        Links to [missing](/tables/missing.md).
+        Links to [missing](missing.md).
         """,
     )
     out = tmp_path / "viz.html"

@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="2920" viewBox="0 0 2000 2920" role="img" aria-labelledby="svg-title svg-desc">
+<title id="svg-title">knowledge-catalog 架构信息图</title>
+<desc id="svg-desc">knowledge-catalog 的独立长幅架构信息图，展示项目指纹、源码分区、真实使用命令、规模、依赖和验证证据。</desc>
+<defs>
+  <marker id="arrow-ocean" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth"><path d="M1,1 L11,6 L1,11 Z" fill="#245DCC"/></marker>
+  <linearGradient id="hero-wash" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9F0FE"/><stop offset="1" stop-color="#E2F4F1"/></linearGradient>
+</defs>
+<rect x="0" y="0" width="2000" height="2920" rx="0" fill="#F6F8FC"/>
+<rect id="hero-field" x="46" y="42" width="1908" height="322" rx="34" fill="url(#hero-wash)"/>
+<text x="78" y="96" fill="#173F91" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start" letter-spacing="2.2">PROJECT ARCHITECTURE · 独立信息图</text>
+<text id="project-title" x="78" y="174" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="62" font-weight="750" text-anchor="start">knowledge-catalog</text>
+<text id="hero-thesis" x="78" y="230" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="27" font-weight="400" text-anchor="start"><tspan x="78" dy="0">把仓库的真实入口、实现分区、可执行用法与验证证据放在一条可回查的阅读路径上。</tspan></text>
+<circle id="source-orbit" cx="1742" cy="184" r="104" fill="#FFFFFF" stroke="#245DCC" stroke-width="5"/>
+<text x="1742" y="175" fill="#173F91" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="46" font-weight="750" text-anchor="middle">101</text>
+<text x="1742" y="215" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="400" text-anchor="middle">源码文件</text>
+<text x="1908" y="330" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="end">快照 e77d3bbc7</text>
+<rect x="78" y="298" width="205" height="48" rx="24" fill="#E9F0FE"/>
+<text x="180.5" y="331" fill="#173F91" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle">296 tracked files</text>
+<rect x="297" y="298" width="165" height="48" rx="24" fill="#E2F4F1"/>
+<text x="379.5" y="331" fill="#137B73" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle">55 test files</text>
+<rect x="476" y="298" width="144" height="48" rx="24" fill="#FAEEDB"/>
+<text x="548.0" y="331" fill="#9B5B09" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle">3 manifests</text>
+<text x="76" y="430" fill="#245DCC" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start" letter-spacing="2">01</text>
+<text x="146" y="432" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="38" font-weight="700" text-anchor="start">项目指纹</text>
+<text x="146" y="474" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="23" font-weight="400" text-anchor="start">README 语境 + 语言规模；数字来自当前 Git 快照。</text>
+<text id="readme-description" x="78" y="548" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="27" font-weight="400" text-anchor="start"><tspan x="78" dy="0">Knowledge Catalog (formerly Dataplex), is an AI-powered data</tspan><tspan x="78" dy="40.5">catalog and metadata management platform. It provides a</tspan><tspan x="78" dy="40.5">dynamic knowledge graph of all your data, structured and un…</tspan></text>
+<text x="1190" y="486" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="24" font-weight="650" text-anchor="start">非空源码行分布</text>
+<rect id="language-bar-1" x="1190" y="516" width="450" height="24" rx="12" fill="#245DCC"/>
+<rect id="language-bar-2" x="1640" y="516" width="227" height="24" rx="12" fill="#137B73"/>
+<rect id="language-bar-3" x="1867" y="516" width="21" height="24" rx="12" fill="#6741B4"/>
+<rect id="language-bar-4" x="1888" y="516" width="4" height="24" rx="12" fill="#9B5B09"/>
+<circle cx="1198" cy="571" r="8" fill="#245DCC"/>
+<text x="1218" y="578" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">TypeScript · 51f · 6,230L</text>
+<circle cx="1548" cy="571" r="8" fill="#137B73"/>
+<text x="1568" y="578" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">Python · 48f · 3,143L</text>
+<circle cx="1198" cy="617" r="8" fill="#6741B4"/>
+<text x="1218" y="624" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">JavaScript · 1f · 293L</text>
+<circle cx="1548" cy="617" r="8" fill="#9B5B09"/>
+<text x="1568" y="624" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">Shell · 1f · 17L</text>
+<text x="76" y="720" fill="#245DCC" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start" letter-spacing="2">02</text>
+<text x="146" y="722" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="38" font-weight="700" text-anchor="start">架构地形</text>
+<text x="146" y="764" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="23" font-weight="400" text-anchor="start">主脊线表示源码阅读顺序；分区职责按路径名称推断，不冒充运行时调用。</text>
+<path id="spine-step-1" d="M326 932 C563 932, 691 995, 928 995" fill="none" stroke="#245DCC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-ocean)"/>
+<path id="spine-step-2" d="M1065 993 C1302 993, 1432 910, 1669 910" fill="none" stroke="#245DCC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-ocean)"/>
+<circle id="component-1" cx="260" cy="925" r="58" fill="#FFFFFF" stroke="#245DCC" stroke-width="5"/>
+<text x="260" y="935" fill="#173F91" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="27" font-weight="750" text-anchor="middle">01</text>
+<text id="component-label-1" x="260" y="833" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="middle"><tspan x="260" dy="0">toolbox</tspan></text>
+<text x="260" y="865" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">实现分区 · 45 files</text>
+<circle id="component-2" cx="1000" cy="1002" r="58" fill="#FFFFFF" stroke="#245DCC" stroke-width="5"/>
+<text x="1000" y="1012" fill="#173F91" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="27" font-weight="750" text-anchor="middle">02</text>
+<text id="component-label-2" x="1000" y="1090" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="middle"><tspan x="1000" dy="0">okf</tspan></text>
+<text x="1000" y="1122" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">实现分区 · 24 files</text>
+<circle id="component-3" cx="1740" cy="900" r="58" fill="#FFFFFF" stroke="#245DCC" stroke-width="5"/>
+<text x="1740" y="910" fill="#173F91" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="27" font-weight="750" text-anchor="middle">03</text>
+<text id="component-label-3" x="1740" y="808" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="middle"><tspan x="1740" dy="0">samples</tspan></text>
+<text x="1740" y="840" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">实现分区 · 18 files</text>
+<text x="82" y="1198" fill="#137B73" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start">入口候选（路径证据）</text>
+<text x="82" y="1242" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="21" font-weight="400" text-anchor="start">→ okf/src/reference_agent/cli.py</text>
+<text x="82" y="1280" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="21" font-weight="400" text-anchor="start">→ samples/enrichment/src/tools/fileskb/main.py</text>
+<text x="82" y="1318" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="21" font-weight="400" text-anchor="start">→ okf/src/reference_agent/__main__.py</text>
+<text x="1040" y="1198" fill="#6741B4" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start">跨分区静态引用</text>
+<text x="1040" y="1242" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="21" font-weight="400" text-anchor="start">toolbox → okf · 2 files</text>
+<rect id="architecture-caveat" x="78" y="1364" width="1844" height="56" rx="14" fill="#FFFFFF" stroke="#D7DFE9" stroke-width="2"/>
+<text x="100" y="1401" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="400" text-anchor="start">读图规则：实心蓝脊线 = 证据导航；“职责”文字 = 路径命名推断；静态引用 ≠ 运行时顺序。</text>
+<text x="76" y="1498" fill="#245DCC" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start" letter-spacing="2">03</text>
+<text x="146" y="1500" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="38" font-weight="700" text-anchor="start">使用路径</text>
+<text x="146" y="1542" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="23" font-weight="400" text-anchor="start">只展示 README、manifest 或 justfile 中实际存在的命令/入口。</text>
+<circle id="usage-step-1" cx="126" cy="1600" r="25" fill="#245DCC" stroke="#245DCC" stroke-width="3"/>
+<text x="126" y="1609" fill="#FFFFFF" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="18" font-weight="750" text-anchor="middle">1</text>
+<text id="usage-command-1" x="184" y="1609" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="21" font-weight="400" text-anchor="start">README / manifest 未声明可执行命令</text>
+<text x="1300" y="1558" fill="#137B73" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start">入口定位</text>
+<text x="1300" y="1602" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">1. okf/src/reference_agent/cli.py</text>
+<text x="1300" y="1640" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">2. samples/enrichment/src/tools/fileskb/main.py</text>
+<text x="1300" y="1678" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">3. okf/src/reference_agent/__main__.py</text>
+<text x="1300" y="1716" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">4. toolbox/mdcode/src/libts/index.ts</text>
+<text x="1300" y="1754" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">5. toolbox/mdcode/src/libts/gcp/index.ts</text>
+<text x="76" y="2050" fill="#245DCC" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start" letter-spacing="2">04</text>
+<text x="146" y="2052" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="38" font-weight="700" text-anchor="start">规模、热点与外部边界</text>
+<text x="146" y="2094" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="23" font-weight="400" text-anchor="start">条形长度编码非空源码行；它描述阅读成本，不代表业务重要性。</text>
+<text x="82" y="2150" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">toolbox</text>
+<rect x="382" y="2131" width="540" height="25" rx="12" fill="#E2E8F1"/>
+<rect id="component-bar-1" x="382" y="2131" width="540" height="25" rx="12" fill="#137B73"/>
+<text x="1012" y="2152" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="end">4,173</text>
+<text x="82" y="2208" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">okf</text>
+<rect x="382" y="2189" width="540" height="25" rx="12" fill="#E2E8F1"/>
+<rect id="component-bar-2" x="382" y="2189" width="255" height="25" rx="12" fill="#245DCC"/>
+<text x="1012" y="2210" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="end">1,969</text>
+<text x="82" y="2266" fill="#172330" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="start">samples</text>
+<rect x="382" y="2247" width="540" height="25" rx="12" fill="#E2E8F1"/>
+<rect id="component-bar-3" x="382" y="2247" width="93" height="25" rx="12" fill="#245DCC"/>
+<text x="1012" y="2268" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="20" font-weight="400" text-anchor="end">719</text>
+<text x="1120" y="2128" fill="#6741B4" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start">直接依赖（manifest）</text>
+<rect id="dependency-1" x="1120" y="2166" width="350" height="48" rx="24" fill="#EEE8FA"/>
+<text x="1295.0" y="2199" fill="#6741B4" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="21" font-weight="600" text-anchor="middle">未在已识别 manifest 中发现直接依赖</text>
+<text x="76" y="2544" fill="#245DCC" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start" letter-spacing="2">05</text>
+<text x="146" y="2546" fill="#172330" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="38" font-weight="700" text-anchor="start">验证与溯源</text>
+<text x="146" y="2588" fill="#566678" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="23" font-weight="400" text-anchor="start">测试路径、构建清单与快照共同限定这张图可以声称什么。</text>
+<text x="82" y="2616" fill="#137B73" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start">测试证据</text>
+<text x="82" y="2658" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">• okf/SPEC.md</text>
+<text x="82" y="2692" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">• okf/tests/__init__.py</text>
+<text x="82" y="2726" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">• okf/tests/test_bigquery_source.py</text>
+<text x="82" y="2760" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">• okf/tests/test_bundle_tools.py</text>
+<text x="1060" y="2616" fill="#9B5B09" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="22" font-weight="700" text-anchor="start">构建 / 依赖证据</text>
+<text x="1060" y="2658" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">• okf/pyproject.toml</text>
+<text x="1060" y="2692" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">• toolbox/enrichment/package.json</text>
+<text x="1060" y="2726" fill="#566678" font-family="Menlo, Cascadia Mono, monospace" font-size="19" font-weight="400" text-anchor="start">• toolbox/mdcode/package.json</text>
+<rect id="provenance-band" x="46" y="2820" width="1908" height="64" rx="20" fill="#172330"/>
+<text x="78" y="2862" fill="#FFFFFF" font-family="Menlo, Cascadia Mono, monospace" font-size="18" font-weight="400" text-anchor="start">来源：Git e77d3bbc7 · README.md · 3 manifests · 55 test files</text>
+<text x="1920" y="2862" fill="#D8E5FA" font-family="Source Han Sans SC, PingFang SC, sans-serif" font-size="17" font-weight="400" text-anchor="end">事实与推断分色 · 生成值见 architecture.source.json</text>
+</svg>

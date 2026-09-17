@@ -1,3 +1,41 @@
 .DS_Store
 node_modules/
 .venv/
+# --- appended by gitignore-sweep on 2026-09-03 ---
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.fleet/
+.cursor/
+# Logs
+*.log
+# Environment
+.env
+.env.local
+.env.*.local
+# Python (in case any sneak in)
+__pycache__/
+*.pyc
+# Node (in case any sneak in)
+# Build artifacts (generic)
+target/
+build/
+dist/
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Generated caches, render slices, and numbered lint images (keep final PNG/PDF).
+
+# Generated caches, render slices, and numbered lint images (keep final PNG/PDF).
